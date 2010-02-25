@@ -1,3 +1,5 @@
+require 'rush'
+
 module Delayed
   class Worker
     SLEEP = 5
@@ -7,6 +9,17 @@ module Delayed
       Merb.logger
     elsif defined?(RAILS_DEFAULT_LOGGER)
       RAILS_DEFAULT_LOGGER
+    end
+
+    # how many workers are running?
+    def self.qty
+      Rush::Box.new.processes.filter(:cmdline => /rake jobs:work/).size
+    end
+
+    def self.ensure_running
+      return if qty > 0
+      return if !defined?(RAILS_ROOT)
+      Rush::Box.new[RAILS_ROOT].bash "rake jobs:work", :background => true
     end
 
     def initialize(options={})
@@ -33,6 +46,7 @@ module Delayed
         break if $exit
 
         if count.zero?
+          break if Delayed::Job.auto_scale && Delayed::Job.count == 0
           sleep(SLEEP)
         else
           say "#{count} jobs processed at %.4f j/s, %d failed ..." % [count / realtime, result.last]

@@ -339,7 +339,30 @@ describe Delayed::Job do
       SimpleJob.runs.should == 3 # runs open job plus worker1 jobs
       # This is useful in the case of a crash/restart on worker1, but make sure multiple workers on the same host have unique names!
     end
-
   end
-  
+
+  context "auto scaling, it" do
+    before do
+      Delayed::Job.auto_scale = true
+    end
+
+    it "doesn't spin a worker if auto_scale = false" do
+      Delayed::Job.auto_scale = false
+      Delayed::Worker.should_not_receive(:ensure_running)
+      Delayed::Job.create(:payload_object => SimpleJob.new)
+    end
+
+    it "doesn't spin a worker if there's one or more working already" do
+      Delayed::Worker.stub!(:qty).and_return(2)
+      Delayed::Worker.should_not_receive(:ensure_running)
+      Delayed::Job.create(:payload_object => SimpleJob.new)
+    end
+
+    it "spins a worker otherwise" do
+      Delayed::Worker.stub!(:qty).and_return(0)
+      Delayed::Worker.should_receive(:ensure_running)
+      Delayed::Job.create(:payload_object => SimpleJob.new)
+    end
+  end
+
 end
