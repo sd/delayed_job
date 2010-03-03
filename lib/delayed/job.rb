@@ -36,6 +36,11 @@ module Delayed
     cattr_accessor :auto_scale
     self.auto_scale = false
 
+    # the auto_scale_manager is the class that knows how to scale workers
+    # up and down
+    cattr_accessor :auto_scale_manager
+    self.auto_scale_manager = :local
+
     # When a worker is exiting, make sure we don't have any locked jobs.
     def self.clear_locks!
       update_all("locked_by = null, locked_at = null", ["locked_by = ?", worker_name])
@@ -264,7 +269,7 @@ module Delayed
     end
 
     def after_create
-      Worker.ensure_running if self.class.auto_scale && Worker.qty == 0
+      Manager.launch if self.class.auto_scale && Manager.qty == 0
     end
   end
 
