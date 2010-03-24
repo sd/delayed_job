@@ -350,18 +350,18 @@ describe Delayed::Job do
 
     it "doesn't spin a worker if auto_scale = false" do
       Delayed::Job.stub!(:auto_scale).and_return(false)
-      @manager.should_not_receive(:launch)
+      @manager.should_not_receive(:scale_up)
       Delayed::Job.create(:payload_object => SimpleJob.new)
     end
 
     it "doesn't spin a worker if there's one or more working already" do
       @manager.stub!(:qty).and_return(2)
-      @manager.should_not_receive(:launch)
+      @manager.should_not_receive(:scale_up)
       Delayed::Job.create(:payload_object => SimpleJob.new)
     end
 
     it "spins a worker otherwise" do
-      @manager.should_receive(:launch)
+      @manager.should_receive(:scale_up)
       Delayed::Job.create(:payload_object => SimpleJob.new)
     end
   end

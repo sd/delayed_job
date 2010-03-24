@@ -32,10 +32,11 @@ module Delayed
 
         count = result.sum
 
+        Manager.scale_down if count.zero? && Job.auto_scale && Job.count == 0
+
         break if $exit
 
         if count.zero?
-          break if Job.auto_scale && Job.count == 0
           sleep(SLEEP)
         else
           say "#{count} jobs processed at %.4f j/s, %d failed ..." % [count / realtime, result.last]

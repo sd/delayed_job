@@ -269,7 +269,7 @@ module Delayed
     end
 
     def after_create
-      Manager.launch if self.class.auto_scale && Manager.qty == 0
+      Manager.scale_up if self.class.auto_scale && Manager.qty == 0
     end
   end
 
