@@ -13,7 +13,7 @@ module Delayed
       options = {}
       handler, options = handler if handler.is_a?(Array)
       require File.dirname(__FILE__) + "/manager/#{handler}"
-      const_get(handler.to_s.capitalize).new(options)
+      const_get(handler.to_s.camelize).new(options)
     end
 
     def method_missing(m, *args)

@@ -2,7 +2,7 @@ require 'heroku'
 
 module Delayed
   module Manager
-    class Heroku
+    class HerokuCedar
       def initialize(options={})
         username = options[:username] || ENV['HEROKU_USERNAME']
         password = options[:password] || ENV['HEROKU_PASSWORD']
