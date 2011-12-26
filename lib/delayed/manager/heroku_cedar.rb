@@ -19,11 +19,11 @@ module Delayed
       end
 
       def scale_up
-        @client.ps_scale(@app, :type => worker, :qty => [self.qty + 1, max_scale].min)
+        @client.ps_scale(@app, :type => "worker", :qty => [self.qty + 1, max_scale].min)
       end
 
       def scale_down
-        @client.ps_scale(@app, :type => worker, :qty => [self.qty - 1, 0].ax)
+        @client.ps_scale(@app, :type => "worker", :qty => [self.qty - 1, 0].ax)
       end
     end
   end
