@@ -12,7 +12,7 @@ module Delayed
       end
 
       def qty
-        @client.ps(@app).select {|p| p["process"] =~ /^worker\./ and p["state"] == "up"}.size
+        @client.ps(@app).select {|p| p["process"] =~ /^worker\./ and ["up", "starting"].include? p["state"]}.size
       end
 
       def scale_up
